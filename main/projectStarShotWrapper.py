@@ -9,7 +9,8 @@ import math
 # -------------------Configuration-----------------------------------
 CFG_FILE = "test.cfg"
 COM_PORTS = {"cfg": "COM6", "data": "COM4"}
-BAUDRATE = 921600
+BAUDRATE_READ = 921600
+BAUDRATE_WRITE = 115200
 #---------------------End of Configuration---------------------------
 
 
@@ -283,8 +284,8 @@ if __name__ == "__main__":
         print("No valid configuration commands found. Exiting...")
         exit()
 
-    cfg_port = init_serial_port(COM_PORTS["cfg"],115200)
-    data_port = init_serial_port(COM_PORTS["data"],921600)
+    cfg_port = init_serial_port(COM_PORTS["cfg"],BAUDRATE_WRITE)
+    data_port = init_serial_port(COM_PORTS["data"],BAUDRATE_READ)
 
     if not cfg_port or not data_port:
         print("Error initializing serial ports. Exiting...")
