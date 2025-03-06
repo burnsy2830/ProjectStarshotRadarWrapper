@@ -4,13 +4,16 @@ import numpy as np
 import serial
 import codecs  
 import binascii 
-import math  
+import math
+import os
+import time  
 
 # -------------------Configuration-----------------------------------
-CFG_FILE = "test.cfg"
-COM_PORTS = {"cfg": "COM6", "data": "COM4"}
+CFG_FILE = "fuckface.cfg"
+COM_PORTS = {"cfg": "COM6", "data": "COM4"} # going to change this to linux friendly on pi 
 BAUDRATE_READ = 921600
 BAUDRATE_WRITE = 115200
+PIPE_NAME = "placeholder"
 #---------------------End of Configuration---------------------------
 
 
@@ -206,6 +209,7 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False):
             detected_targets.extend(targets)
             if debug:
                 for target in targets:
+                    print(target)
                     print(f"Target {target['tid']}: pos=({target['posX']:.2f}, {target['posY']:.2f}, {target['posZ']:.2f}), "
                           f"vel=({target['velX']:.2f}, {target['velY']:.2f}, {target['velZ']:.2f}), "
                           f"acc=({target['accX']:.2f}, {target['accY']:.2f}, {target['accZ']:.2f})")
@@ -217,7 +221,6 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False):
 
         # Move to the next TLV
         tlvStart += 8 + tlvLen
-
     return result, headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber, detected_targets, point_cloud
 
 
@@ -273,11 +276,24 @@ def getHex(data):
     return np.matmul(data,word)
 
 
+def write_to_pipe(data):
+    """Writes parsed object data to the named pipe."""
+    try:
+        with open(PIPE_NAME, "w") as pipe:
+            pipe.write(data + "\n")
+            pipe.flush()
+    except FileNotFoundError:
+        print("Pipe not found, waiting...")
+        time.sleep(1)
+    except BrokenPipeError:
+        print("Broken pipe, retrying...")
+        time.sleep(1)
+
+
 
 
 
 if __name__ == "__main__":
-    
     #Pass CFG commands to IWR6843ISK-ODS 
     cli_commands = parse_cfg_file(CFG_FILE) 
     if not cli_commands:
@@ -303,7 +319,21 @@ if __name__ == "__main__":
                 data = data_port.read(data_port.in_waiting)
                 data_array = np.frombuffer(data, dtype=np.uint8)
                 readNumBytes = len(data_array)
-                parser_one_mmw_demo_output_packet(data_array,readNumBytes,True)
+                result, headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber, detected_targets, point_cloud = parser_one_mmw_demo_output_packet(data_array, readNumBytes)
+
+                # if detected objects are valid, we write them to the named pipe
+                if detected_targets:
+
+                       for target in detected_targets: 
+                            msg = (f"Target {target['tid']}: "
+                                f"pos=({target['posX']:.2f}, {target['posY']:.2f}, {target['posZ']:.2f}), "
+                                f"vel=({target['velX']:.2f}, {target['velY']:.2f}, {target['velZ']:.2f}), "
+                                f"acc=({target['accX']:.2f}, {target['accY']:.2f}, {target['accZ']:.2f})")
+                            print("Writing to pipe:", msg) 
+                            write_to_pipe(msg) # to C++ motor process. 
+
+
+
                 time.sleep(0.1)
             
     except KeyboardInterrupt:
@@ -312,4 +342,3 @@ if __name__ == "__main__":
         cfg_port.close()
         data_port.close()
         print("Ports closed. Exiting...")
-
