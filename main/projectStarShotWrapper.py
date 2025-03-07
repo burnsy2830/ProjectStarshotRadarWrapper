@@ -9,11 +9,11 @@ import os
 import time  
 
 # -------------------Configuration-----------------------------------
-CFG_FILE = "fuckface.cfg"
-COM_PORTS = {"cfg": "COM6", "data": "COM4"} # going to change this to linux friendly on pi 
+CFG_FILE = "/home/lorien/dev/capstone/ProjectStarshotRadarWrapper/Cfgs/testcfg.cfg"
+COM_PORTS = {"cfg": "/dev/ttyUSB0", "data": "/dev/ttyUSB1"} # going to change this to linux friendly on pi 
 BAUDRATE_READ = 921600
 BAUDRATE_WRITE = 115200
-PIPE_NAME = "placeholder"
+PIPE_NAME = "/home/lorien/dev/capstone/radarpipe"
 #---------------------End of Configuration---------------------------
 
 
@@ -239,7 +239,7 @@ def init_serial_port(port, baudrate):
 #-------------------End of Serial port init-----------------------
 
 
-#TODO: implement packet parsing logic
+
 
 
 def getUint32(data):
@@ -276,9 +276,16 @@ def getHex(data):
     return np.matmul(data,word)
 
 
+
 def write_to_pipe(data):
     """Writes parsed object data to the named pipe."""
     try:
+        print("In send to pipe")
+        if not os.path.exists(PIPE_NAME):
+            print(f"Pipe {PIPE_NAME} does not exist yet. Retrying...")
+            time.sleep(1)
+            return  # Don't proceed with writing, just return and retry
+
         with open(PIPE_NAME, "w") as pipe:
             pipe.write(data + "\n")
             pipe.flush()
@@ -288,8 +295,6 @@ def write_to_pipe(data):
     except BrokenPipeError:
         print("Broken pipe, retrying...")
         time.sleep(1)
-
-
 
 
 
@@ -338,6 +343,7 @@ if __name__ == "__main__":
             
     except KeyboardInterrupt:
         print("\nTerminating...")
+    
     finally:
         cfg_port.close()
         data_port.close()
