@@ -330,10 +330,10 @@ if __name__ == "__main__":
                 if detected_targets:
 
                        for target in detected_targets: 
-                            msg = (f"Target {target['tid']}: "
-                                f"pos=({target['posX']:.2f}, {target['posY']:.2f}, {target['posZ']:.2f}), "
-                                f"vel=({target['velX']:.2f}, {target['velY']:.2f}, {target['velZ']:.2f}), "
-                                f"acc=({target['accX']:.2f}, {target['accY']:.2f}, {target['accZ']:.2f})")
+                            msg = (f"{target['tid']}|"
+                                    f"{target['posX']:.2f}|{target['posY']:.2f}|{target['posZ']:.2f}|"
+                                    f"{target['velX']:.2f}|{target['velY']:.2f}|{target['velZ']:.2f}|"
+                                    f"{target['accX']:.2f}|{target['accY']:.2f}|{target['accZ']:.2f}")
                             print("Writing to pipe:", msg) 
                             write_to_pipe(msg) # to C++ motor process. 
 
