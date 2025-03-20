@@ -60,17 +60,20 @@ def send_config(port, commands):
 
 #----------------Start of Packet Parsing---------------------
 def checkMagicPattern(data):
-    """!
-       This function check if data arrary contains the magic pattern which is the start of one mmw demo output packet.  
+    try:
+        """!
+        This function check if data arrary contains the magic pattern which is the start of one mmw demo output packet.  
 
-        @param data : 1-demension byte array
-        @return     : 1 if magic pattern is found
-                      0 if magic pattern is not found 
-    """ 
-    found = 0
-    if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
-        found = 1
-    return (found)
+            @param data : 1-demension byte array
+            @return     : 1 if magic pattern is found
+                        0 if magic pattern is not found 
+        """ 
+        found = 0
+        if (data[0] == 2 and data[1] == 1 and data[2] == 4 and data[3] == 3 and data[4] == 6 and data[5] == 5 and data[6] == 8 and data[7] == 7):
+            found = 1
+        return (found)
+    except Exception:
+        pass
 
 
 def parse_gtrack_targets(payload):
