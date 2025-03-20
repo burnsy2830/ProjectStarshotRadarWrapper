@@ -253,7 +253,7 @@ def getUint32(data):
         @return     : 32-bit unsigned integer
     """ 
     if len(data) == 0:
-        return None
+        return 0
     return (data[0] +
             data[1]*256 +
             data[2]*65536 +
