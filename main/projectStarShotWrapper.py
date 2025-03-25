@@ -9,7 +9,7 @@ import os
 import time  
 
 # -------------------Configuration-----------------------------------
-CFG_FILE = "/home/lorien/dev/capstone/ProjectStarshotRadarWrapper/Cfgs/testcfg.cfg"
+CFG_FILE = "/home/lorien/dev/capstone/ProjectStarshotRadarWrapper/Cfgs/area_scanner_68xx_ODS.cfg"
 COM_PORTS = {"cfg": "/dev/ttyUSB0", "data": "/dev/ttyUSB1"} # going to change this to linux friendly on pi 
 BAUDRATE_READ = 921600
 BAUDRATE_WRITE = 115200
