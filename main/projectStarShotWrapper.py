@@ -9,7 +9,7 @@ import os
 import time  
 
 # -------------------Configuration-----------------------------------
-CFG_FILE = "fuckface.cfg"
+CFG_FILE = "test.cfg"
 COM_PORTS = {"cfg": "COM6", "data": "COM4"} # going to change this to linux friendly on pi 
 BAUDRATE_READ = 921600
 BAUDRATE_WRITE = 115200
